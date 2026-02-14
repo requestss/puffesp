@@ -14,7 +14,7 @@ local config = _G.PuffshroomConfig or {
 }
 
 local colors = {
-    Normal = Color3.fromRGB(139, 69, 19),
+    Common = Color3.fromRGB(139, 69, 19),
     Rare = Color3.fromRGB(255, 255, 255),
     Epic = Color3.fromRGB(255, 255, 0),
     Legendary = Color3.fromRGB(0, 112, 255),
@@ -22,40 +22,42 @@ local colors = {
 }
 
 local function getRarity(obj)
-    local attachment = obj:FindFirstChild("Attachment")
-    if not attachment then return end
-    
-    local nameRow = attachment:FindFirstChild("NameRow")
-    if not nameRow then return end
-    
-    local gui = nameRow:FindFirstChild("Gui")
-    if not gui then return end
-    
-    local label = gui:FindFirstChild("TextLabel")
-    if not label then return end
-    
-    local txt = label.Text
-    local rarity = "Normal"
+    local name = obj.Name
+    local rarity = "Common"
     local lvl
     
-    if txt:find("Mythic") then
+    if name:find("Mythic") then
         rarity = "Mythic"
-    elseif txt:find("Legendary") then
+    elseif name:find("Legendary") then
         rarity = "Legendary"
-    elseif txt:find("Epic") then
+    elseif name:find("Epic") then
         rarity = "Epic"
-    elseif txt:find("Rare") then
+    elseif name:find("Rare") then
         rarity = "Rare"
+    elseif name:find("Common") then
+        rarity = "Common"
     end
     
-    local match = txt:match("Lvl (%d+)")
-    if match then lvl = tonumber(match) end
+    local attachment = obj:FindFirstChild("Attachment")
+    if attachment then
+        local nameRow = attachment:FindFirstChild("NameRow")
+        if nameRow then
+            local gui = nameRow:FindFirstChild("Gui")
+            if gui then
+                local label = gui:FindFirstChild("TextLabel")
+                if label then
+                    local match = label.Text:match("Lvl (%d+)")
+                    if match then lvl = tonumber(match) end
+                end
+            end
+        end
+    end
     
     return rarity, lvl
 end
 
 local function shouldShow(rarity)
-    if rarity == "Normal" then return config.showNormal end
+    if rarity == "Common" then return config.showNormal end
     if rarity == "Rare" then return config.showRare end
     if rarity == "Epic" then return config.showEpic end
     if rarity == "Legendary" then return config.showLegendary end
